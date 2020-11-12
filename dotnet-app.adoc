@@ -1,0 +1,82 @@
+[source, sh]
+----
+dotnet new webapi -o Gateway01 --no-https
+cd Gateway01
+dotnet add package Microsoft.EntityFrameworkCore.InMemory
+
+cat <<EOF > appsettings.json
+{
+  "Logging": {
+    "LogLevel": {
+      "Default": "Information",
+      "Microsoft": "Warning",
+      "Microsoft.Hosting.Lifetime": "Information"
+    }
+  },
+  "AllowedHosts": "*",
+  "Urls": "http://0.0.0.0:5000"
+}
+EOF
+
+cd ..
+
+dotnet new webapi -o Backend01 --no-https
+cd Backend01
+dotnet add package Microsoft.EntityFrameworkCore.InMemory
+
+cat <<EOF > appsettings.json
+{
+  "Logging": {
+    "LogLevel": {
+      "Default": "Information",
+      "Microsoft": "Warning",
+      "Microsoft.Hosting.Lifetime": "Information"
+    }
+  },
+  "AllowedHosts": "*",
+  "Urls": "http://0.0.0.0:5001"
+}
+EOF
+
+cd ..
+
+dotnet new webapi -o Gateway02 --no-https
+cd Gateway02
+dotnet add package Microsoft.EntityFrameworkCore.InMemory
+
+cat <<EOF > appsettings.json
+{
+  "Logging": {
+    "LogLevel": {
+      "Default": "Information",
+      "Microsoft": "Warning",
+      "Microsoft.Hosting.Lifetime": "Information"
+    }
+  },
+  "AllowedHosts": "*",
+  "Urls": "http://0.0.0.0:5002"
+}
+EOF
+
+cd ..
+
+dotnet new webapi -o Backend02 --no-https
+cd Backend02
+dotnet add package Microsoft.EntityFrameworkCore.InMemory
+
+cat <<EOF > appsettings.json
+{
+  "Logging": {
+    "LogLevel": {
+      "Default": "Information",
+      "Microsoft": "Warning",
+      "Microsoft.Hosting.Lifetime": "Information"
+    }
+  },
+  "AllowedHosts": "*",
+  "Urls": "http://0.0.0.0:5003"
+}
+EOF
+
+cd ..
+----

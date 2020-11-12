@@ -1,0 +1,127 @@
+= Network policies
+
+If a Pod is matched by selectors (`spec->podSelector`) in one or more NetworkPolicy objects, then the Pod will accept only connections that are allowed by at least one of those NetworkPolicy objects (`spec->ingress`). A Pod that is not selected by any NetworkPolicy objects is fully accessible.
+
+This selects all pods...
+
+[source, yaml]
+----
+spec:
+  podSelector:
+----
+
+This accepts no traffic...
+
+[source, yaml]
+----
+spec:
+  podSelector:
+  ingress: []
+----
+
+== Deny all
+
+[source, yaml]
+----
+kind: NetworkPolicy
+apiVersion: networking.k8s.io/v1
+metadata:
+  name: deny-all
+spec:
+  podSelector:
+  ingress: []
+----
+
+[source, sh]
+.deny-all.sh
+----
+include::./deny-all.sh[attributes]
+----
+
+== Only allow connections from the OpenShift Container Platform Ingress Controller
+
+[source, yaml]
+----
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: allow-from-openshift-ingress
+spec:
+  ingress:
+  - from:
+    - namespaceSelector:
+        matchLabels:
+          network.openshift.io/policy-group: ingress
+  podSelector: {}
+  policyTypes:
+  - Ingress
+----
+
+[source, sh]
+.allow-from-openshift-ingress.sh
+----
+include::./allow-from-openshift-ingress.sh[attributes]
+----
+
+[source, sh]
+.allow-from-openshift-ingress-and-same.sh
+----
+include::./allow-from-openshift-ingress-and-same.sh[attributes]
+----
+
+== Only accept connections from Pods within a project
+
+[source, yaml]
+----
+kind: NetworkPolicy
+apiVersion: networking.k8s.io/v1
+metadata:
+  name: allow-same-namespace
+spec:
+  podSelector:
+  ingress:
+  - from:
+    - podSelector: {}
+----
+
+== Only allow HTTP and HTTPS traffic based on Pod labels
+
+[source, yaml]
+----
+kind: NetworkPolicy
+apiVersion: networking.k8s.io/v1
+metadata:
+  name: allow-http-and-https
+spec:
+  podSelector:
+    matchLabels:
+      role: frontend
+  ingress:
+  - ports:
+    - protocol: TCP
+      port: 80
+    - protocol: TCP
+      port: 443
+----
+
+== Accept connections by using both namespace and Pod selectors
+
+[source, yaml]
+----
+kind: NetworkPolicy
+apiVersion: networking.k8s.io/v1
+metadata:
+  name: allow-pod-and-namespace-both
+spec:
+  podSelector:
+    matchLabels:
+      name: test-pods
+  ingress:
+    - from:
+      - namespaceSelector:
+          matchLabels:
+            project: project_name
+        podSelector:
+          matchLabels:
+            name: test-pods
+----
