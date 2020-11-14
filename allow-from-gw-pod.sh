@@ -1,14 +1,11 @@
 #!/bin/sh
-export FRONTEND_PROJECT=np-frontend
-export BACKEND_PROJECT=np-backend
+export FRONTEND_PROJECT=dotnet-frontend
+export BACKEND_PROJECT=dotnet-backend
 
-
-
-oc new-project ${CLIENT_PROJECT}
-oc new-project ${TARGET_PROJECT}
-
-oc delete networkpolicy allow-from-all-namespaces -n ${TARGET_PROJECT}
-oc delete networkpolicy allow-from-ingress-namespace -n ${TARGET_PROJECT}
+oc delete networkpolicy allow-from-all-namespaces -n ${FRONTEND_PROJECT}
+oc delete networkpolicy allow-from-ingress-namespace -n ${FRONTEND_PROJECT}
+oc delete networkpolicy allow-from-all-namespaces -n ${BACKEND_PROJECT}
+oc delete networkpolicy allow-from-ingress-namespace -n ${BACKEND_PROJECT}
 
 oc new-app -n ${TARGET_PROJECT} \
   redhat-openjdk18-openshift:1.4~https://github.com/cvicens/wine \
@@ -23,7 +20,7 @@ kubectl delete pod curl -n ${CLIENT_PROJECT}
 kubectl run curl --image=radial/busyboxplus:curl --restart=Never -n ${CLIENT_PROJECT} -- sleep 3600
 kubectl wait --for=condition=Ready pod/curl -n ${CLIENT_PROJECT}
 
-# specific pod in allowd project
+# specific pod in allowed project
 kubectl delete pod curl -n ${TARGET_PROJECT}
 kubectl run curl --image=radial/busyboxplus:curl --restart=Never -n ${TARGET_PROJECT} -- sleep 3600
 kubectl wait --for=condition=Ready pod/curl -n ${TARGET_PROJECT}

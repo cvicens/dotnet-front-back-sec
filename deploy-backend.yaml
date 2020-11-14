@@ -3,7 +3,10 @@ apiVersion: v1
 kind: Namespace
 metadata:
   creationTimestamp: null
-  name: backend-dev
+  name: dotnet-backend
+  labels:
+    project: dotnet-backend
+    role: backend
 ---
 apiVersion: apps/v1
 kind: Deployment
@@ -13,7 +16,7 @@ metadata:
     app: backend01
     role: backend
   name: backend01
-  namespace: backend-dev
+  namespace: dotnet-backend
 spec:
   replicas: 1
   selector:
@@ -27,12 +30,21 @@ spec:
         app: backend01
         role: backend
     spec:
+      affinity:
+        nodeAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            nodeSelectorTerms:
+            - matchExpressions:
+              - key: role
+                operator: In
+                values:
+                - backend
       containers:
       - image: quay.io/cvicens/backend01:3.1
         name: backend01
         env:
           - name: BACKEND_HOST
-            value: backend01.backend-dev
+            value: backend01.dotnet-backend
         resources: {}
 ---
 apiVersion: apps/v1
@@ -43,7 +55,7 @@ metadata:
     app: backend02
     role: backend
   name: backend02
-  namespace: backend-dev
+  namespace: dotnet-backend
 spec:
   replicas: 1
   selector:
@@ -57,19 +69,28 @@ spec:
         app: backend02
         role: backend
     spec:
+      affinity:
+        nodeAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            nodeSelectorTerms:
+            - matchExpressions:
+              - key: role
+                operator: In
+                values:
+                - backend
       containers:
       - image: quay.io/cvicens/backend02:3.1
         name: backend02
         env:
           - name: BACKEND_HOST
-            value: backend02.backend-dev
+            value: backend02.dotnet-backend
         resources: {}
 ---
 kind: Service
 apiVersion: v1
 metadata:
   name: backend01
-  namespace: backend-dev
+  namespace: dotnet-backend
   labels:
     app: backend01
     role: backend
@@ -87,7 +108,7 @@ kind: Service
 apiVersion: v1
 metadata:
   name: backend02
-  namespace: backend-dev
+  namespace: dotnet-backend
   labels:
     app: backend02
     role: backend

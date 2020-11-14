@@ -3,7 +3,10 @@ apiVersion: v1
 kind: Namespace
 metadata:
   creationTimestamp: null
-  name: frontend-dev
+  name: dotnet-frontend
+  labels:
+    project: dotnet-frontend
+    role: frontend
 ---
 apiVersion: apps/v1
 kind: Deployment
@@ -13,7 +16,7 @@ metadata:
     app: gateway01
     role: frontend
   name: gateway01
-  namespace: frontend-dev
+  namespace: dotnet-frontend
 spec:
   replicas: 1
   selector:
@@ -27,12 +30,21 @@ spec:
         app: gateway01
         role: frontend
     spec:
+      affinity:
+        nodeAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            nodeSelectorTerms:
+            - matchExpressions:
+              - key: role
+                operator: In
+                values:
+                - frontend
       containers:
       - image: quay.io/cvicens/gateway01:3.1
         name: gateway01
         env:
           - name: BACKEND_HOST
-            value: backend01.backend-dev
+            value: backend01.dotnet-backend
           - name: BACKEND_PORT
             value: "5000"
         resources: {}
@@ -45,7 +57,7 @@ metadata:
     app: gateway02
     role: frontend
   name: gateway02
-  namespace: frontend-dev
+  namespace: dotnet-frontend
 spec:
   replicas: 1
   selector:
@@ -59,12 +71,21 @@ spec:
         app: gateway02
         role: frontend
     spec:
+      affinity:
+        nodeAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            nodeSelectorTerms:
+            - matchExpressions:
+              - key: role
+                operator: In
+                values:
+                - frontend
       containers:
       - image: quay.io/cvicens/gateway02:3.1
         name: gateway02
         env:
           - name: BACKEND_HOST
-            value: backend02.backend-dev
+            value: backend02.dotnet-backend
           - name: BACKEND_PORT
             value: "5000"
         resources: {}
@@ -73,7 +94,7 @@ kind: Service
 apiVersion: v1
 metadata:
   name: gateway01
-  namespace: frontend-dev
+  namespace: dotnet-frontend
   labels:
     app: gateway01
     role: frontend
@@ -91,7 +112,7 @@ kind: Service
 apiVersion: v1
 metadata:
   name: gateway02
-  namespace: frontend-dev
+  namespace: dotnet-frontend
   labels:
     app: gateway02
     role: frontend
@@ -109,7 +130,7 @@ kind: Route
 apiVersion: route.openshift.io/v1
 metadata:
   name: gateway01
-  namespace: frontend-dev
+  namespace: dotnet-frontend
   labels:
     app: gateway01
     role: frontend
@@ -126,7 +147,7 @@ kind: Route
 apiVersion: route.openshift.io/v1
 metadata:
   name: gateway02
-  namespace: frontend-dev
+  namespace: dotnet-frontend
   labels:
     app: gateway02
     role: frontend

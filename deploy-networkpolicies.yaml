@@ -1,0 +1,55 @@
+---
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: allow-from-openshift-ingress
+  namespace: dotnet-frontend
+spec:
+  ingress:
+  - from:
+    - namespaceSelector:
+        matchLabels:
+          network.openshift.io/policy-group: ingress
+  podSelector: {}
+  policyTypes:
+  - Ingress
+---
+kind: NetworkPolicy
+apiVersion: networking.k8s.io/v1
+metadata:
+  name: allow-from-frontend-01
+  namespace: dotnet-backend
+spec:
+  podSelector:
+    matchLabels:
+      app: backend01
+      role: backend
+  ingress:
+    - from:
+      - namespaceSelector:
+          matchLabels:
+            project: dotnet-frontend
+        podSelector:
+          matchLabels:
+            app: gateway01
+            role: frontend
+---
+kind: NetworkPolicy
+apiVersion: networking.k8s.io/v1
+metadata:
+  name: allow-from-frontend-02
+  namespace: dotnet-backend
+spec:
+  podSelector:
+    matchLabels:
+      app: backend02
+      role: backend
+  ingress:
+    - from:
+      - namespaceSelector:
+          matchLabels:
+            project: dotnet-frontend
+        podSelector:
+          matchLabels:
+            app: gateway02
+            role: frontend
