@@ -15,6 +15,8 @@ metadata:
   labels:
     app: gateway01
     role: frontend
+    app.kubernetes.io/part-of: "Service-A"
+    app.openshift.io/runtime: dotnet
   name: gateway01
   namespace: dotnet-frontend
 spec:
@@ -56,6 +58,8 @@ metadata:
   labels:
     app: gateway02
     role: frontend
+    app.kubernetes.io/part-of: "Service-B"
+    app.openshift.io/runtime: dotnet
   name: gateway02
   namespace: dotnet-frontend
 spec:
